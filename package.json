@@ -1,0 +1,26 @@
+{
+  "name": "productivity-toolkit",
+  "version": "1.0.0",
+  "description": "Personal productivity system with AI-powered research, content writing, and task management",
+  "type": "module",
+  "main": "src/index.js",
+  "bin": {
+    "toolkit": "./bin/toolkit.js"
+  },
+  "scripts": {
+    "research": "node bin/toolkit.js research",
+    "write": "node bin/toolkit.js write",
+    "capture": "node bin/toolkit.js capture",
+    "process": "node bin/toolkit.js process",
+    "review": "node bin/toolkit.js review"
+  },
+  "keywords": [
+    "productivity",
+    "ai",
+    "research",
+    "content",
+    "automation"
+  ],
+  "author": "Boston Douglas",
+  "license": "MIT"
+}

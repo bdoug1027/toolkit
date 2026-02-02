@@ -1,0 +1,21 @@
+{
+  "llm": {
+    "provider": "ollama",
+    "model": "llama3:8b",
+    "baseUrl": "http://localhost:11434",
+    "temperature": 0.7,
+    "maxTokens": 2048
+  },
+  "search": {
+    "provider": "brave",
+    "maxResults": 5
+  },
+  "paths": {
+    "capture": "../CAPTURE.md",
+    "projects": "../PROJECTS.md",
+    "clients": "../CLIENTS.md",
+    "research": "../RESEARCH.md",
+    "content": "../CONTENT.md",
+    "weeklyReview": "../WEEKLY-REVIEW.md"
+  }
+}
