@@ -62,7 +62,9 @@
   </main>
 
   <script>
-    const BASE_PATH = '..';
+    // Detect if running on GitHub Pages or locally
+    const isGitHubPages = window.location.hostname.includes('github.io');
+    const BASE_PATH = isGitHubPages ? '/toolkit' : '..';
     
     async function loadFile(filename) {
       try {
