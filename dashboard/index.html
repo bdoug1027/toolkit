@@ -6,203 +6,408 @@
   <title>Toolkit Dashboard</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    body { background: #0f0f0f; }
-    .prose h1 { font-size: 1.5rem; font-weight: bold; margin-bottom: 1rem; color: #f9fafb; }
-    .prose h2 { font-size: 1.25rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.5rem; color: #e5e7eb; }
-    .prose h3 { font-size: 1.1rem; font-weight: 600; margin-top: 1rem; color: #d1d5db; }
-    .prose p { color: #9ca3af; }
-    .prose table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-    .prose th, .prose td { border: 1px solid #374151; padding: 0.5rem; text-align: left; color: #d1d5db; }
-    .prose th { background: #1f2937; font-weight: 600; color: #f9fafb; }
-    .prose tr:nth-child(even) { background: #111827; }
-    .prose ul { list-style: disc; margin-left: 1.5rem; color: #9ca3af; }
-    .prose li { margin-bottom: 0.25rem; }
-    .prose code { background: #1f2937; color: #a78bfa; padding: 0.125rem 0.375rem; border-radius: 0.25rem; font-size: 0.875rem; }
-    .prose pre { background: #1a1a2e; color: #f9fafb; padding: 1rem; border-radius: 0.5rem; overflow-x: auto; border: 1px solid #374151; }
-    .prose a { color: #a78bfa; text-decoration: none; }
-    .prose a:hover { text-decoration: underline; }
-    .prose blockquote { border-left: 3px solid #7c3aed; padding-left: 1rem; color: #9ca3af; font-style: italic; margin: 1rem 0; }
-    .prose hr { border-color: #374151; margin: 1.5rem 0; }
-    .prose strong { color: #f9fafb; }
-    .btn-nav { transition: all 0.2s ease; }
-    .btn-nav:hover { transform: translateY(-1px); }
-    .btn-nav.active { ring: 2px; ring-color: currentColor; }
-    .stat-card { transition: all 0.2s ease; }
-    .stat-card:hover { transform: translateY(-2px); }
+    body { background: #1a1a2e; }
+    .kanban-column { min-height: 70vh; }
+    .card { cursor: grab; transition: all 0.2s ease; }
+    .card:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.3); }
+    .priority-high { border-left: 3px solid #ef4444; }
+    .priority-medium { border-left: 3px solid #f59e0b; }
+    .priority-low { border-left: 3px solid #22c55e; }
+    .column-header { position: sticky; top: 0; z-index: 10; }
+    .tag { font-size: 0.65rem; padding: 2px 6px; border-radius: 3px; }
+    .scrollbar-thin::-webkit-scrollbar { width: 6px; }
+    .scrollbar-thin::-webkit-scrollbar-track { background: #1f2937; border-radius: 3px; }
+    .scrollbar-thin::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 3px; }
+    .modal { display: none; }
+    .modal.active { display: flex; }
+    .prose { color: #d1d5db; }
+    .prose h1, .prose h2, .prose h3 { color: #f9fafb; }
+    .prose a { color: #a78bfa; }
+    .prose code { background: #374151; padding: 2px 6px; border-radius: 4px; color: #a78bfa; }
+    .prose table { width: 100%; border-collapse: collapse; }
+    .prose th, .prose td { border: 1px solid #374151; padding: 8px; }
+    .prose th { background: #1f2937; }
   </style>
 </head>
 <body class="min-h-screen text-gray-100">
-  <nav class="bg-gray-900/80 backdrop-blur-sm border-b border-gray-800 sticky top-0 z-50">
-    <div class="max-w-7xl mx-auto px-4 py-3">
+  <!-- Header -->
+  <header class="bg-gray-900/90 backdrop-blur-sm border-b border-gray-700 sticky top-0 z-50">
+    <div class="max-w-full mx-auto px-6 py-3">
       <div class="flex items-center justify-between">
-        <h1 class="text-xl font-bold text-white">🛠️ Toolkit Dashboard</h1>
-        <div class="flex gap-2 flex-wrap">
-          <button onclick="loadFile('PROJECTS.md')" id="btn-projects" class="btn-nav px-3 py-1.5 bg-purple-900/50 text-purple-300 rounded-lg hover:bg-purple-800/50 text-sm font-medium border border-purple-700/50">Projects</button>
-          <button onclick="loadFile('CAPTURE.md')" id="btn-capture" class="btn-nav px-3 py-1.5 bg-blue-900/50 text-blue-300 rounded-lg hover:bg-blue-800/50 text-sm font-medium border border-blue-700/50">Capture</button>
-          <button onclick="loadFile('CLIENTS.md')" id="btn-clients" class="btn-nav px-3 py-1.5 bg-green-900/50 text-green-300 rounded-lg hover:bg-green-800/50 text-sm font-medium border border-green-700/50">Clients</button>
-          <button onclick="loadFile('RESEARCH.md')" id="btn-research" class="btn-nav px-3 py-1.5 bg-yellow-900/50 text-yellow-300 rounded-lg hover:bg-yellow-800/50 text-sm font-medium border border-yellow-700/50">Research</button>
-          <button onclick="loadFile('CONTENT.md')" id="btn-content" class="btn-nav px-3 py-1.5 bg-pink-900/50 text-pink-300 rounded-lg hover:bg-pink-800/50 text-sm font-medium border border-pink-700/50">Content</button>
-          <button onclick="loadFile('WEEKLY-REVIEW.md')" id="btn-review" class="btn-nav px-3 py-1.5 bg-indigo-900/50 text-indigo-300 rounded-lg hover:bg-indigo-800/50 text-sm font-medium border border-indigo-700/50">Review</button>
+        <div class="flex items-center gap-4">
+          <h1 class="text-xl font-bold text-white flex items-center gap-2">
+            <span class="text-2xl">🚀</span> Project Pipeline
+          </h1>
+          <span class="text-gray-500 text-sm">Kanban View</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <button onclick="openModal('CAPTURE.md')" class="px-3 py-1.5 bg-blue-600/20 text-blue-400 rounded-lg hover:bg-blue-600/30 text-sm font-medium border border-blue-600/30 flex items-center gap-2">
+            <i class="fas fa-inbox"></i> Capture
+          </button>
+          <button onclick="openModal('RESEARCH.md')" class="px-3 py-1.5 bg-yellow-600/20 text-yellow-400 rounded-lg hover:bg-yellow-600/30 text-sm font-medium border border-yellow-600/30 flex items-center gap-2">
+            <i class="fas fa-flask"></i> Research
+          </button>
+          <button onclick="openModal('CLIENTS.md')" class="px-3 py-1.5 bg-green-600/20 text-green-400 rounded-lg hover:bg-green-600/30 text-sm font-medium border border-green-600/30 flex items-center gap-2">
+            <i class="fas fa-users"></i> Clients
+          </button>
         </div>
       </div>
     </div>
-  </nav>
+  </header>
 
-  <main class="max-w-7xl mx-auto px-4 py-8">
-    <!-- Quick Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      <div class="stat-card bg-gradient-to-br from-purple-900/40 to-purple-950/40 rounded-xl p-5 border border-purple-700/30">
-        <h2 class="text-sm font-medium text-purple-300 mb-1">Active Projects</h2>
-        <p class="text-3xl font-bold text-white" id="stat-projects">2</p>
-        <p class="text-xs text-purple-400 mt-1">Tapflow, Toolkit</p>
-      </div>
-      <div class="stat-card bg-gradient-to-br from-blue-900/40 to-blue-950/40 rounded-xl p-5 border border-blue-700/30">
-        <h2 class="text-sm font-medium text-blue-300 mb-1">Open Tasks</h2>
-        <p class="text-3xl font-bold text-white" id="stat-tasks">-</p>
-        <p class="text-xs text-blue-400 mt-1">From capture inbox</p>
-      </div>
-      <div class="stat-card bg-gradient-to-br from-yellow-900/40 to-yellow-950/40 rounded-xl p-5 border border-yellow-700/30">
-        <h2 class="text-sm font-medium text-yellow-300 mb-1">Pending Research</h2>
-        <p class="text-3xl font-bold text-white" id="stat-research">-</p>
-        <p class="text-xs text-yellow-400 mt-1">Topics to explore</p>
-      </div>
-      <div class="stat-card bg-gradient-to-br from-green-900/40 to-green-950/40 rounded-xl p-5 border border-green-700/30">
-        <h2 class="text-sm font-medium text-green-300 mb-1">Clients</h2>
-        <p class="text-3xl font-bold text-white" id="stat-clients">-</p>
-        <p class="text-xs text-green-400 mt-1">Active accounts</p>
-      </div>
-    </div>
-
-    <!-- Project Cards (always visible) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8" id="project-cards">
-      <div class="bg-gray-900/60 rounded-xl p-5 border border-gray-700/50 hover:border-purple-500/50 transition-colors">
-        <div class="flex items-start justify-between mb-3">
-          <div>
-            <span class="text-2xl">🟡</span>
-            <h3 class="text-lg font-semibold text-white inline ml-2">Tapflow</h3>
+  <!-- Kanban Board -->
+  <main class="p-6 overflow-x-auto">
+    <div class="flex gap-4 min-w-max">
+      
+      <!-- Backlog Column -->
+      <div class="w-80 flex-shrink-0">
+        <div class="column-header bg-gray-800/80 backdrop-blur rounded-t-xl p-3 border border-gray-700 border-b-0">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-gray-500"></span>
+              <h2 class="font-semibold text-gray-300">Backlog</h2>
+            </div>
+            <span class="text-xs text-gray-500 bg-gray-700 px-2 py-0.5 rounded-full" id="count-backlog">0</span>
           </div>
-          <span class="px-2 py-1 bg-yellow-900/50 text-yellow-300 text-xs rounded-full border border-yellow-700/50">In Progress</span>
         </div>
-        <p class="text-gray-400 text-sm mb-3">AI-powered lead generation loop: scrape → enrich → score → CRM → outreach</p>
-        <div class="flex items-center gap-2 text-xs text-gray-500">
-          <span class="px-2 py-0.5 bg-red-900/30 text-red-400 rounded">High Priority</span>
-          <span>•</span>
-          <span>Next: GHL workflow + e2e test</span>
+        <div class="kanban-column bg-gray-800/40 rounded-b-xl p-3 border border-gray-700 border-t-0 space-y-3 scrollbar-thin overflow-y-auto" id="col-backlog">
+          <!-- Cards go here -->
         </div>
       </div>
-      <div class="bg-gray-900/60 rounded-xl p-5 border border-gray-700/50 hover:border-green-500/50 transition-colors">
-        <div class="flex items-start justify-between mb-3">
-          <div>
-            <span class="text-2xl">✅</span>
-            <h3 class="text-lg font-semibold text-white inline ml-2">Productivity Toolkit</h3>
-          </div>
-          <span class="px-2 py-1 bg-green-900/50 text-green-300 text-xs rounded-full border border-green-700/50">Complete</span>
-        </div>
-        <p class="text-gray-400 text-sm mb-3">Personal productivity system: capture, projects, research, content planning</p>
-        <div class="flex items-center gap-2 text-xs text-gray-500">
-          <span class="px-2 py-0.5 bg-green-900/30 text-green-400 rounded">In Use</span>
-          <span>•</span>
-          <span>Iterate based on feedback</span>
-        </div>
-      </div>
-    </div>
 
-    <!-- Main Content -->
-    <div class="bg-gray-900/60 rounded-xl border border-gray-700/50 p-6">
-      <div id="content" class="prose max-w-none">
-        <p class="text-gray-500">Select a section above to view...</p>
+      <!-- Planned Column -->
+      <div class="w-80 flex-shrink-0">
+        <div class="column-header bg-blue-900/40 backdrop-blur rounded-t-xl p-3 border border-blue-700/50 border-b-0">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-blue-500"></span>
+              <h2 class="font-semibold text-blue-300">Planned</h2>
+            </div>
+            <span class="text-xs text-blue-400 bg-blue-900/50 px-2 py-0.5 rounded-full" id="count-planned">0</span>
+          </div>
+        </div>
+        <div class="kanban-column bg-blue-900/20 rounded-b-xl p-3 border border-blue-700/50 border-t-0 space-y-3 scrollbar-thin overflow-y-auto" id="col-planned">
+        </div>
       </div>
+
+      <!-- In Progress Column -->
+      <div class="w-80 flex-shrink-0">
+        <div class="column-header bg-yellow-900/40 backdrop-blur rounded-t-xl p-3 border border-yellow-700/50 border-b-0">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-yellow-500 animate-pulse"></span>
+              <h2 class="font-semibold text-yellow-300">In Progress</h2>
+            </div>
+            <span class="text-xs text-yellow-400 bg-yellow-900/50 px-2 py-0.5 rounded-full" id="count-progress">0</span>
+          </div>
+        </div>
+        <div class="kanban-column bg-yellow-900/20 rounded-b-xl p-3 border border-yellow-700/50 border-t-0 space-y-3 scrollbar-thin overflow-y-auto" id="col-progress">
+        </div>
+      </div>
+
+      <!-- Review/Testing Column -->
+      <div class="w-80 flex-shrink-0">
+        <div class="column-header bg-purple-900/40 backdrop-blur rounded-t-xl p-3 border border-purple-700/50 border-b-0">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-purple-500"></span>
+              <h2 class="font-semibold text-purple-300">Review / Testing</h2>
+            </div>
+            <span class="text-xs text-purple-400 bg-purple-900/50 px-2 py-0.5 rounded-full" id="count-review">0</span>
+          </div>
+        </div>
+        <div class="kanban-column bg-purple-900/20 rounded-b-xl p-3 border border-purple-700/50 border-t-0 space-y-3 scrollbar-thin overflow-y-auto" id="col-review">
+        </div>
+      </div>
+
+      <!-- Complete Column -->
+      <div class="w-80 flex-shrink-0">
+        <div class="column-header bg-green-900/40 backdrop-blur rounded-t-xl p-3 border border-green-700/50 border-b-0">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="w-3 h-3 rounded-full bg-green-500"></span>
+              <h2 class="font-semibold text-green-300">Complete</h2>
+            </div>
+            <span class="text-xs text-green-400 bg-green-900/50 px-2 py-0.5 rounded-full" id="count-complete">0</span>
+          </div>
+        </div>
+        <div class="kanban-column bg-green-900/20 rounded-b-xl p-3 border border-green-700/50 border-t-0 space-y-3 scrollbar-thin overflow-y-auto" id="col-complete">
+        </div>
+      </div>
+
     </div>
   </main>
 
-  <footer class="max-w-7xl mx-auto px-4 py-6 text-center text-gray-600 text-sm">
-    <p>Built with 🤖 by OpenClaw • Last updated: <span id="timestamp"></span></p>
-  </footer>
+  <!-- Modal for viewing files -->
+  <div id="modal" class="modal fixed inset-0 bg-black/70 backdrop-blur-sm z-50 items-center justify-center p-4" onclick="closeModal(event)">
+    <div class="bg-gray-900 rounded-2xl border border-gray-700 max-w-3xl w-full max-h-[80vh] overflow-hidden" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between p-4 border-b border-gray-700">
+        <h3 class="font-semibold text-white" id="modal-title">Loading...</h3>
+        <button onclick="closeModal()" class="text-gray-400 hover:text-white p-1">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 overflow-y-auto max-h-[60vh] prose" id="modal-content">
+        <p class="text-gray-500">Loading...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card Detail Modal -->
+  <div id="card-modal" class="modal fixed inset-0 bg-black/70 backdrop-blur-sm z-50 items-center justify-center p-4" onclick="closeCardModal(event)">
+    <div class="bg-gray-900 rounded-2xl border border-gray-700 max-w-2xl w-full max-h-[85vh] overflow-hidden" onclick="event.stopPropagation()">
+      <div class="p-6" id="card-modal-content">
+      </div>
+    </div>
+  </div>
 
   <script>
-    // Detect if running on GitHub Pages or locally
     const isGitHubPages = window.location.hostname.includes('github.io');
     const BASE_PATH = isGitHubPages ? '/toolkit' : '..';
-    
-    let currentFile = null;
 
-    async function loadFile(filename) {
+    // Project data - this would ideally come from PROJECTS.md parsing
+    const projects = [
+      {
+        id: 'tapflow',
+        name: 'Tapflow',
+        description: 'AI-powered lead generation loop: scrape → enrich → score → CRM → outreach → conversations → bookings',
+        status: 'progress', // backlog, planned, progress, review, complete
+        priority: 'high',
+        tags: ['AI', 'Automation', 'Sales'],
+        progress: 75,
+        nextAction: 'Complete GHL workflow, run e2e test',
+        blockers: ['Waiting on ngrok setup'],
+        tasks: { done: 12, total: 16 },
+        updated: '2026-02-02'
+      },
+      {
+        id: 'toolkit',
+        name: 'Productivity Toolkit',
+        description: 'Personal productivity system with capture inbox, project tracking, research notes, and content planning',
+        status: 'complete',
+        priority: 'medium',
+        tags: ['Productivity', 'Personal'],
+        progress: 100,
+        nextAction: 'Iterate based on feedback',
+        blockers: [],
+        tasks: { done: 8, total: 8 },
+        updated: '2026-02-02'
+      },
+      {
+        id: 'innowavv-site',
+        name: 'Innowavv Website',
+        description: 'Company website refresh with new branding and service pages',
+        status: 'planned',
+        priority: 'medium',
+        tags: ['Website', 'Marketing'],
+        progress: 10,
+        nextAction: 'Design mockups',
+        blockers: [],
+        tasks: { done: 1, total: 10 },
+        updated: '2026-01-28'
+      },
+      {
+        id: 'client-portal',
+        name: 'Client Portal',
+        description: 'Self-service portal for clients to view reports, invoices, and project status',
+        status: 'backlog',
+        priority: 'low',
+        tags: ['SaaS', 'Clients'],
+        progress: 0,
+        nextAction: 'Define requirements',
+        blockers: [],
+        tasks: { done: 0, total: 0 },
+        updated: '2026-01-15'
+      }
+    ];
+
+    function createCard(project) {
+      const priorityClass = {
+        high: 'priority-high',
+        medium: 'priority-medium', 
+        low: 'priority-low'
+      }[project.priority];
+
+      const priorityColor = {
+        high: 'bg-red-500/20 text-red-400',
+        medium: 'bg-yellow-500/20 text-yellow-400',
+        low: 'bg-green-500/20 text-green-400'
+      }[project.priority];
+
+      const tagsHtml = project.tags.map(tag => 
+        `<span class="tag bg-gray-700 text-gray-300">${tag}</span>`
+      ).join('');
+
+      const progressColor = project.progress >= 75 ? 'bg-green-500' : 
+                           project.progress >= 50 ? 'bg-yellow-500' : 
+                           project.progress >= 25 ? 'bg-blue-500' : 'bg-gray-500';
+
+      return `
+        <div class="card bg-gray-800 rounded-xl p-4 border border-gray-700 ${priorityClass}" onclick="openCardDetail('${project.id}')">
+          <div class="flex items-start justify-between mb-2">
+            <h3 class="font-semibold text-white text-sm">${project.name}</h3>
+            <span class="tag ${priorityColor}">${project.priority}</span>
+          </div>
+          <p class="text-gray-400 text-xs mb-3 line-clamp-2">${project.description}</p>
+          
+          <!-- Progress bar -->
+          <div class="mb-3">
+            <div class="flex justify-between text-xs text-gray-500 mb-1">
+              <span>Progress</span>
+              <span>${project.progress}%</span>
+            </div>
+            <div class="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+              <div class="h-full ${progressColor} rounded-full transition-all" style="width: ${project.progress}%"></div>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="flex flex-wrap gap-1 mb-3">
+            ${tagsHtml}
+          </div>
+
+          <!-- Footer -->
+          <div class="flex items-center justify-between text-xs text-gray-500 pt-2 border-t border-gray-700">
+            <span><i class="fas fa-tasks mr-1"></i>${project.tasks.done}/${project.tasks.total}</span>
+            <span>${project.updated}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderBoard() {
+      const columns = {
+        backlog: document.getElementById('col-backlog'),
+        planned: document.getElementById('col-planned'),
+        progress: document.getElementById('col-progress'),
+        review: document.getElementById('col-review'),
+        complete: document.getElementById('col-complete')
+      };
+
+      // Clear columns
+      Object.values(columns).forEach(col => col.innerHTML = '');
+
+      // Count cards per column
+      const counts = { backlog: 0, planned: 0, progress: 0, review: 0, complete: 0 };
+
+      // Add cards to columns
+      projects.forEach(project => {
+        if (columns[project.status]) {
+          columns[project.status].innerHTML += createCard(project);
+          counts[project.status]++;
+        }
+      });
+
+      // Update counts
+      document.getElementById('count-backlog').textContent = counts.backlog;
+      document.getElementById('count-planned').textContent = counts.planned;
+      document.getElementById('count-progress').textContent = counts.progress;
+      document.getElementById('count-review').textContent = counts.review;
+      document.getElementById('count-complete').textContent = counts.complete;
+    }
+
+    function openCardDetail(projectId) {
+      const project = projects.find(p => p.id === projectId);
+      if (!project) return;
+
+      const blockersHtml = project.blockers.length > 0 
+        ? project.blockers.map(b => `<li class="text-red-400"><i class="fas fa-exclamation-triangle mr-2"></i>${b}</li>`).join('')
+        : '<li class="text-gray-500">No blockers</li>';
+
+      const modal = document.getElementById('card-modal');
+      document.getElementById('card-modal-content').innerHTML = `
+        <div class="flex items-start justify-between mb-4">
+          <div>
+            <h2 class="text-2xl font-bold text-white mb-1">${project.name}</h2>
+            <div class="flex gap-2">
+              ${project.tags.map(t => `<span class="tag bg-gray-700 text-gray-300">${t}</span>`).join('')}
+            </div>
+          </div>
+          <button onclick="closeCardModal()" class="text-gray-400 hover:text-white p-1">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+
+        <p class="text-gray-300 mb-6">${project.description}</p>
+
+        <div class="grid grid-cols-2 gap-4 mb-6">
+          <div class="bg-gray-800 rounded-lg p-4">
+            <h4 class="text-xs text-gray-500 uppercase mb-2">Progress</h4>
+            <div class="flex items-end gap-2">
+              <span class="text-3xl font-bold text-white">${project.progress}%</span>
+              <span class="text-gray-500 text-sm mb-1">${project.tasks.done} of ${project.tasks.total} tasks</span>
+            </div>
+            <div class="h-2 bg-gray-700 rounded-full mt-2 overflow-hidden">
+              <div class="h-full bg-purple-500 rounded-full" style="width: ${project.progress}%"></div>
+            </div>
+          </div>
+          <div class="bg-gray-800 rounded-lg p-4">
+            <h4 class="text-xs text-gray-500 uppercase mb-2">Priority</h4>
+            <span class="text-2xl font-bold capitalize ${project.priority === 'high' ? 'text-red-400' : project.priority === 'medium' ? 'text-yellow-400' : 'text-green-400'}">${project.priority}</span>
+          </div>
+        </div>
+
+        <div class="bg-gray-800 rounded-lg p-4 mb-4">
+          <h4 class="text-xs text-gray-500 uppercase mb-2"><i class="fas fa-arrow-right mr-1"></i>Next Action</h4>
+          <p class="text-white">${project.nextAction}</p>
+        </div>
+
+        <div class="bg-gray-800 rounded-lg p-4">
+          <h4 class="text-xs text-gray-500 uppercase mb-2"><i class="fas fa-ban mr-1"></i>Blockers</h4>
+          <ul class="space-y-1 text-sm">
+            ${blockersHtml}
+          </ul>
+        </div>
+
+        <div class="mt-6 pt-4 border-t border-gray-700 flex justify-between text-sm text-gray-500">
+          <span>Last updated: ${project.updated}</span>
+          <a href="${BASE_PATH}/projects/${project.id}.md" class="text-purple-400 hover:underline">View full details →</a>
+        </div>
+      `;
+      modal.classList.add('active');
+    }
+
+    function closeCardModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('card-modal').classList.remove('active');
+    }
+
+    async function openModal(filename) {
+      const modal = document.getElementById('modal');
+      document.getElementById('modal-title').textContent = filename;
+      document.getElementById('modal-content').innerHTML = '<p class="text-gray-500">Loading...</p>';
+      modal.classList.add('active');
+
       try {
         const response = await fetch(`${BASE_PATH}/${filename}`);
-        if (!response.ok) throw new Error(`File not found: ${filename}`);
+        if (!response.ok) throw new Error('File not found');
         const text = await response.text();
-        document.getElementById('content').innerHTML = marked.parse(text);
-        updateStats(filename, text);
-        updateActiveButton(filename);
-        currentFile = filename;
+        document.getElementById('modal-content').innerHTML = marked.parse(text);
       } catch (error) {
-        document.getElementById('content').innerHTML = `
-          <div class="text-center py-8">
-            <p class="text-gray-500 mb-2">📄 ${filename}</p>
-            <p class="text-red-400">${error.message}</p>
-            <p class="text-gray-600 text-sm mt-2">Create this file in the toolkit directory to see content here.</p>
-          </div>
+        document.getElementById('modal-content').innerHTML = `
+          <p class="text-red-400">Could not load ${filename}</p>
+          <p class="text-gray-500 text-sm">Create this file in the toolkit directory.</p>
         `;
       }
     }
 
-    function updateActiveButton(filename) {
-      // Remove active state from all buttons
-      document.querySelectorAll('.btn-nav').forEach(btn => {
-        btn.classList.remove('ring-2');
-      });
-      // Add active state to current button
-      const btnId = 'btn-' + filename.replace('.md', '').toLowerCase().replace('weekly-', '');
-      const btn = document.getElementById(btnId);
-      if (btn) btn.classList.add('ring-2');
+    function closeModal(e) {
+      if (e && e.target !== e.currentTarget) return;
+      document.getElementById('modal').classList.remove('active');
     }
 
-    async function updateStats(filename, text) {
-      if (filename === 'PROJECTS.md') {
-        const activeCount = (text.match(/🟢|🟡/g) || []).length;
-        document.getElementById('stat-projects').textContent = activeCount || '2';
+    // Close modals on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        document.getElementById('modal').classList.remove('active');
+        document.getElementById('card-modal').classList.remove('active');
       }
-      if (filename === 'CAPTURE.md') {
-        const taskCount = (text.match(/- \[ \]/g) || []).length;
-        document.getElementById('stat-tasks').textContent = taskCount || '0';
-      }
-      if (filename === 'RESEARCH.md') {
-        const researchCount = (text.match(/- \[ \]|🔍|📚/g) || []).length;
-        document.getElementById('stat-research').textContent = researchCount || '0';
-      }
-      if (filename === 'CLIENTS.md') {
-        const clientCount = (text.match(/##\s+[A-Z]/g) || []).length;
-        document.getElementById('stat-clients').textContent = clientCount || '0';
-      }
-    }
-
-    // Load all stats on startup
-    async function loadAllStats() {
-      const files = ['PROJECTS.md', 'CAPTURE.md', 'RESEARCH.md', 'CLIENTS.md'];
-      for (const file of files) {
-        try {
-          const response = await fetch(`${BASE_PATH}/${file}`);
-          if (response.ok) {
-            const text = await response.text();
-            updateStats(file, text);
-          }
-        } catch (e) {
-          // Ignore errors for missing files
-        }
-      }
-    }
-
-    // Set timestamp
-    document.getElementById('timestamp').textContent = new Date().toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
     });
 
-    // Load stats and default content
-    loadAllStats();
-    loadFile('PROJECTS.md');
+    // Initialize
+    renderBoard();
   </script>
 </body>
 </html>
